@@ -7,10 +7,38 @@ Created on Jun 15, 2013
 import httplib
 import xml.etree.ElementTree as ET
 
-from basicPlot import plotData
+from datetime import datetime
+import datetime as dt
+
+
+start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+print start
+
 
 url = "www.vattenfall.de"
 api = "/SmeterEngine/networkcontrol"
+
+
+def whatIsThePeakStatusInBerlinNow():
+    
+    ff = "%Y-%m-%d %H:%M:%S"
+
+    end = datetime.now().strftime(ff)
+    start = datetime.now() - dt.timedelta(minutes=15)
+    start = start.strftime(ff)
+    
+    nowRequest = '''<smeterengine>
+<scale>DAY</scale>
+<city>BERLIN</city>
+<district>
+<time_period begin="%s" end="%s" time_zone='CET'/>
+</district>
+</smeterengine>''' % (start, end)
+    
+    result = queryVattenfall(nowRequest)
+    print "--> ", result
+    
+
 
 
 def queryVattenfall(xmlRequest):
@@ -38,6 +66,8 @@ exampleRequest = '''<smeterengine>
 </district>
 </smeterengine>'''
 
+
+
 lastDays = '''<smeterengine>
 <scale>DAY</scale>
 <city>BERLIN</city>
@@ -52,6 +82,8 @@ def findStats():
     #xmlRoot = 
     
     
+    
+
     
 
 def main():
@@ -69,10 +101,9 @@ def main():
     print usageValues
     print generationValues
     
-    plotData(usageValues, generationValues)
     
     
-    
+    whatIsThePeakStatusInBerlinNow()
 
 
 if __name__ == '__main__':
