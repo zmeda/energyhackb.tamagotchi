@@ -6,6 +6,7 @@ Created on Jun 15, 2013
 
 import httplib
 import xml.etree.ElementTree as ET
+from random import choice
 
 from datetime import datetime
 import datetime as dt
@@ -18,13 +19,16 @@ print start
 url = "www.vattenfall.de"
 api = "/SmeterEngine/networkcontrol"
 
+def main2():
+    whatIsThePeakStatusInBerlinNow()
 
 def whatIsThePeakStatusInBerlinNow():
     
     ff = "%Y-%m-%d %H:%M:%S"
 
-    end = datetime.now().strftime(ff)
-    start = datetime.now() - dt.timedelta(minutes=15)
+    end = datetime.now()
+    end = end.strftime(ff)
+    start = datetime.now() - dt.timedelta(minutes=60)
     start = start.strftime(ff)
     
     nowRequest = '''<smeterengine>
@@ -34,11 +38,19 @@ def whatIsThePeakStatusInBerlinNow():
 <time_period begin="%s" end="%s" time_zone='CET'/>
 </district>
 </smeterengine>''' % (start, end)
+
+    print nowRequest
     
     result = queryVattenfall(nowRequest)
     print "--> ", result
     
-
+    usageXML = ET.fromstring(result)
+    bla = [el.text for el in usageXML.iter("usage") if float(el.text) > 1.0]
+    print bla
+    print bla[:-1]
+    print bla[-1:]
+    
+    return float(bla[-1:][0])
 
 
 def queryVattenfall(xmlRequest):
@@ -76,11 +88,6 @@ lastDays = '''<smeterengine>
 </district>
 </smeterengine>'''
 
-
-def findStats():
-    xmlReply = queryVattenfall(lastDays)
-    #xmlRoot = 
-    
     
     
 
@@ -88,22 +95,38 @@ def findStats():
 
 def main():
     
-    findStats()
     
-    testReply = queryVattenfall(exampleRequest)
+    testReply = queryVattenfall(lastDays)
     print testReply
     
     root = ET.fromstring(testReply)
     
-    usageValues = [float(element.text) for element in root.iter("usage")]
-    generationValues = [float(element.text) for element in root.iter("generation")]
+    usageValues = [float(element.text) for element in root.iter("usage") if float(element.text) > 1.0]
+    generationValues = [float(element.text) for element in root.iter("generation") if float(element.text) > 1.0]
+    
+    maxValue = max(usageValues)
+    minValue = min(usageValues)
+    threshold = (maxValue - minValue) * 0.1
+    upperThreshold = maxValue - threshold
+    lowerThreshold = minValue + threshold
+    result = 0
+    value = whatIsThePeakStatusInBerlinNow()
+    if (value > upperThreshold):
+        result = 3
+    elif (value < lowerThreshold):
+        result = 1
+    else:
+        result = 2
+    
+    print maxValue, minValue, upperThreshold, lowerThreshold, value, result 
     
     print usageValues
     print generationValues
     
+    print "Result is: ", result
     
     
-    whatIsThePeakStatusInBerlinNow()
+
 
 
 if __name__ == '__main__':
