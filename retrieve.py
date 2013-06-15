@@ -6,8 +6,9 @@ Created on Jun 15, 2013
 
 import httplib
 import xml.etree.ElementTree as ET
+from random import choice
 
-from basicPlot import plotData
+#from basicPlot import plotData
 
 url = "www.vattenfall.de"
 api = "/SmeterEngine/networkcontrol"
@@ -63,13 +64,29 @@ def main():
     
     root = ET.fromstring(testReply)
     
-    usageValues = [float(element.text) for element in root.iter("usage")]
-    generationValues = [float(element.text) for element in root.iter("generation")]
+    usageValues = [float(element.text) for element in root.iter("usage") if float(element.text) > 1.0]
+    generationValues = [float(element.text) for element in root.iter("generation") if float(element.text) > 1.0]
+    
+    maxValue = max(usageValues)
+    minValue = min(usageValues)
+    threshold = (maxValue - minValue) * 0.1
+    upperThreshold = maxValue - threshold
+    lowerThreshold = minValue + threshold
+    result = 0
+    value = choice(usageValues)
+    if (value > upperThreshold):
+        result = 3
+    elif (value < lowerThreshold):
+        result = 1
+    else:
+        result = 2
+    
+    print maxValue, minValue, upperThreshold, lowerThreshold, value, result 
     
     print usageValues
     print generationValues
     
-    plotData(usageValues, generationValues)
+    #plotData(usageValues, generationValues)
     
     
     
