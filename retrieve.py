@@ -5,6 +5,7 @@ Created on Jun 15, 2013
 '''
 
 import httplib
+import xml.etree.ElementTree as ET
 
 url = "www.vattenfall.de"
 api = "/SmeterEngine/networkcontrol"
@@ -32,7 +33,7 @@ exampleRequest = '''<smeterengine>
 <scale>DAY</scale>
 <city>BERLIN</city>
 <district>
-<time_period begin="2013-06-12 15:40:00" end="2013-06-12 17:00:00" time_zone='CET'/>
+<time_period begin="2013-06-14 00:00:00" end="2013-06-15 00:00:00" time_zone='CET'/>
 </district>
 </smeterengine>'''
 
@@ -41,7 +42,9 @@ def main():
     testReply = queryVattenfall(exampleRequest)
     print testReply
     
-    
+    root = ET.fromstring(testReply)
+    for usage in root.iter('usage'):
+        print usage.text
     
     
 
