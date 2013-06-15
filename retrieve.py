@@ -19,8 +19,10 @@ print start
 url = "www.vattenfall.de"
 api = "/SmeterEngine/networkcontrol"
 
-def main2():
-    whatIsThePeakStatusInBerlinNow()
+
+
+
+
 
 def whatIsThePeakStatusInBerlinNow():
     
@@ -125,6 +127,7 @@ def main():
     
     print "Result is: ", result
     
+    return result
     
 
 

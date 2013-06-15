@@ -32,3 +32,12 @@ def plotData(consumption, generation):
         
     savefig("report.png")    
     
+
+def main():
+    pass
+
+
+if __name__ == '__main__':
+    main()  
+    
+    
