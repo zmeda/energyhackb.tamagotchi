@@ -7,6 +7,8 @@ Created on Jun 15, 2013
 import httplib
 import xml.etree.ElementTree as ET
 
+from basicPlot import plotData
+
 url = "www.vattenfall.de"
 api = "/SmeterEngine/networkcontrol"
 
@@ -25,7 +27,6 @@ def queryVattenfall(xmlRequest):
     statuscode, statusmessage, header = webservice.getreply()
     print statuscode, statusmessage, header
     result = webservice.getfile().read()
-    print "--",  result
     
     return result
 
@@ -37,14 +38,39 @@ exampleRequest = '''<smeterengine>
 </district>
 </smeterengine>'''
 
+lastDays = '''<smeterengine>
+<scale>DAY</scale>
+<city>BERLIN</city>
+<district>
+<time_period begin="2013-06-04 00:00:00" end="2013-06-15 00:00:00" time_zone='CET'/>
+</district>
+</smeterengine>'''
+
+
+def findStats():
+    xmlReply = queryVattenfall(lastDays)
+    #xmlRoot = 
+    
+    
+    
+
 def main():
+    
+    findStats()
     
     testReply = queryVattenfall(exampleRequest)
     print testReply
     
     root = ET.fromstring(testReply)
-    for usage in root.iter('usage'):
-        print usage.text
+    
+    usageValues = [float(element.text) for element in root.iter("usage")]
+    generationValues = [float(element.text) for element in root.iter("generation")]
+    
+    print usageValues
+    print generationValues
+    
+    plotData(usageValues, generationValues)
+    
     
     
 
